@@ -7,6 +7,16 @@ class Termometro:
     def __init__(self):
         self.custome = pygame.image.load('images/termo.png')
 
+    def convertir(self, grados, tounidad):
+        resultado = 0
+        if tounidad == 'F':
+            resultado = (grados * 9/5) + 32
+        elif tounidad == 'C':
+            resultado = (grados - 32) * 5/9
+        else:
+            resultado = grados
+        return '{:1.2f}'.format(resultado)
+
 
 class Selector:
     __tipounidad = None
@@ -17,14 +27,30 @@ class Selector:
         self.__custome.append(pygame.image.load('images/F.png'))
         self.__tipounidad = unidad
 
-    
+    def custome(self):
+        if self.__tipounidad == 'F':
+            return self.__custome[1]
+        else:
+            return self.__custome[0]
 
+    # Esto sirve para cambiar la unidad de F a C o viceversa.
+
+    def change(self):
+
+        if self.__tipounidad == 'F':
+            self.__tipounidad = 'C'
+        else:
+            self.__tipounidad = 'F'
+
+    def unidad(self):
+        return self.__tipounidad
 
 class Numerinput:
     __value = 0
-    __strvalue = '0'
+    __strvalue = ''
     __position = [0, 0]
     __size = [0, 0]
+    __pointcount = 0
 
     def __init__(self, value=0):
 
@@ -43,12 +69,16 @@ class Numerinput:
     def on_event(self, event):
         # Comprobamos que sea un número.
         if event.type == KEYDOWN:
-            if event.unicode in '0123456789' and len(self.__strvalue) <= 9:
+            if event.unicode in '0123456789' and len(self.__strvalue) <= 9 or event.unicode == '.' and self.__pointcount == 0:
                 self.__strvalue += event.unicode
                 self.value(self.__strvalue)
                 print(self.__strvalue, self.__value)
+                if event.unicode == '.':
+                    self.__pointcount += 1
                 # Perrmitimos que se pueda borrar.
             elif event.key == K_BACKSPACE:
+                if self.__strvalue[:-1] == '.':
+                    self.__pointcount -= 1
                 self.__strvalue = self.__strvalue[0:-1]
                 # Llamamos a una función value para que me compruebe que se puede transformar.
                 self.value(self.__strvalue)
@@ -82,8 +112,12 @@ class Numerinput:
             val = str(val)
             # La comprobación.
             try:
-                self.__value = int(val)
+                self.__value = float(val)
                 self.__strvalue = val
+                if '.' in self.__strvalue:
+                    self.__pointcount = 1
+                else:
+                    self.__pointcount = 0
             except:
                 pass
 
@@ -160,6 +194,22 @@ class Mainapp:
                     self.__on_close()
 
                 self.entrada.on_event(event)
+
+                # Vamos a ver como hacemos lo del click
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # Primero cambiamos de F a C.
+                    self.selector.change()
+                    # Le decimos a nuestro getter de value q nos de el valor.
+                    grados = self.entrada.value()
+                    # Llamamos al getter de selector para que nos diga en que unidad esta.
+                    nuevaunidad = self.selector.unidad()
+                    print(nuevaunidad)
+                    # Calculamos la temperatura llamando a conversor.
+                    temperatura = self.termometro.convertir(grados, nuevaunidad)
+                    print(temperatura)
+                    # Asignamos la nueva temperatura a la entrada.
+                    self.entrada.value(temperatura)
                 '''   
                     Lo metemos en una función en Numberinput.             
                     elif event.type == KETDOWN:
@@ -167,22 +217,20 @@ class Mainapp:
                     if event.unicode.isdigit()
                     '''
 
-
-
-
             # Modifica los inputs.
 
             # Pinta las modificaciones.
+            # Pintar fondo de pantalla.
+            self.__screen.fill((244, 236, 203))
             # Termometro
             self.__screen.blit(self.termometro.custome, (100, 70))
-
             # Para que me pinte el rectangulo, de un color y con un tamaño.
             text = self.entrada.render()
             pygame.draw.rect(self.__screen, (255, 255, 255), text[0])
             # Para que me pinte los números, los trataremos como un disfraz.
             self.__screen.blit(text[1], self.entrada.pos())
             # Para que me pinte el selector.
-            self.__screen.blit(self.selector.)
+            self.__screen.blit(self.selector.custome(), (262, 153))
             # Refresco de pantalla.
             pygame.display.flip()
 
