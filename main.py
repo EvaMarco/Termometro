@@ -50,6 +50,7 @@ class Selector:
     def unidad(self):
         return self.__tipounidad
 
+
 class Numerinput:
     __value = 0
     __strvalue = ''
@@ -99,8 +100,6 @@ class Numerinput:
                 self.value(self.__strvalue)
                 print(self.__strvalue, self.__value)
 
-
-
     def render(self):
         # Creación del texto.
         textblock = self.__font.render(self.__strvalue, True, (74, 74, 74))
@@ -114,14 +113,14 @@ class Numerinput:
         rect.size = self.__size
         # Hacemos que nos devuelva los rectángulos en forma de diccionario o tupla.
 
-        return(rect, textblock)
+        return rect, textblock
 
         # Creamos un setter y un getter del value, tamaño y posición.
 
     def value(self, val=None):
 
         # Getter de value.
-        if val == None:
+        if val is None:
             return self.__value
 
         # Setter de value. Con compración de que se pueda transformar en float.
@@ -161,7 +160,7 @@ class Numerinput:
 
     def pos(self, val=None):
         # Getter de posición.
-        if val == None:
+        if val is None:
             return self.__position
 
         # Setter de posición.
@@ -174,7 +173,7 @@ class Numerinput:
     def size(self, val=None):
         # Getter de Size.
 
-        if val == None:
+        if val is None:
             return self.__size
         # Setter de Size
         else:
